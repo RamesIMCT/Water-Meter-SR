@@ -284,6 +284,28 @@ tr:hover td{background:var(--surface-2)}
   .qr-grid{grid-template-columns:repeat(3,1fr)}
   .f-3col{grid-template-columns:1fr 1fr 1fr}
 }
+/* ── ไซส์ตัวอักษรสำหรับจอคอมพิวเตอร์ ──
+   ค่า --fs-* เดิมใช้ clamp(min, Nvw, max) ซึ่งออกแบบมาสำหรับมือถือ — บนจอกว้าง
+   (เช่น 1920px) ค่า Nvw จะเกิน max เสมอ ทำให้ตัวอักษรค้างอยู่ที่ค่า max (ตัวเล็กสุด)
+   ไม่ขยายตามจอเลย เพิ่ม breakpoint นี้เพื่อ override เป็นค่าคงที่ที่ใหญ่ขึ้นบนจอคอมพิวเตอร์ */
+@media(min-width:900px){
+  :root{
+    --fs-xs:15px;
+    --fs-sm:16px;
+    --fs-md:18px;
+    --fs-lg:20px;
+    --fs-xl:28px;
+    --fs-2xl:40px;
+  }
+  .sc-name{font-size:11px}
+  .mb-label,.mb-unit{font-size:11px}
+  .vbar-val,.vbar-label{font-size:12px}
+  .qi-name{font-size:11px}
+  .sub-row-meta{font-size:13px}
+  .sub-row-dec{font-size:11px}
+  .chart-ctrl-label{font-size:12px}
+  .ctrl-btn,.ctrl-date{font-size:13px}
+}
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
@@ -428,7 +450,7 @@ i svg{
   <div class="tab admin-tab" onclick="goTab('chart')">
     <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 3 3 4-6"/></svg></i>กราฟ
   </div>
-  <div class="tab admin-tab" onclick="goTab('summary')">
+  <div class="tab admin-tab" onclick="goTab('summary')" style="display:none" title="ปิดชั่วคราว — รอปรับรูปแบบรายงานใหม่">
     <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg></i>สรุป
   </div>
   <div class="tab admin-tab" onclick="goTab('qr')">
@@ -444,7 +466,7 @@ i svg{
   <div class="panel active" id="panel-entry">
     <div id="sub-list-screen">
       <div class="card">
-        <div class="card-title">📍 เลือกจุดวัดน้ำ</div>
+        <div class="card-title">📍 เลือก Meter</div>
         <div class="rec-badge" id="hdr-badge">0 rec</div>
         <div id="zone-areas"></div>
         <div class="btn-row" style="margin-top:12px">
@@ -537,7 +559,7 @@ i svg{
       <div class="card-title">🔍 กรองข้อมูล <span id="filter-badge" class="filter-badge" style="display:none">● Active</span></div>
       <div class="f-2col">
         <div class="f-row">
-          <label class="f-label">จุดวัดน้ำ</label>
+          <label class="f-label">Meter</label>
           <select class="f-input" id="fl-sub"><option value="">ทั้งหมด</option></select>
         </div>
         <div class="f-row">
@@ -559,7 +581,7 @@ i svg{
           <option value="newest" selected>ล่าสุดที่กรอก</option>
           <option value="date-desc">วันที่ใหม่→เก่า</option>
           <option value="date-asc">วันที่เก่า→ใหม่</option>
-          <option value="sub-asc">รหัสจุด A→Z</option>
+          <option value="sub-asc">Meter ID A→Z</option>
         </select>
       </div>
       <div class="btn-row">
@@ -574,7 +596,7 @@ i svg{
       <div class="card-title">📋 รายการทั้งหมด <span id="data-count" style="font-size:10px;color:var(--text-3);font-weight:400;margin-left:4px"></span></div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Sub</th><th>วันที่</th><th>เวลา</th><th>มิเตอร์</th><th>ใช้ไป</th><th class="desktop-only">ผู้บันทึก</th><th class="desktop-only">หมายเหตุ</th><th></th></tr></thead>
+          <thead><tr><th>รหัส</th><th>วันที่</th><th>เวลา</th><th>มิเตอร์</th><th>ใช้ไป</th><th class="desktop-only">ผู้บันทึก</th><th class="desktop-only">หมายเหตุ</th><th></th></tr></thead>
           <tbody id="main-body"></tbody>
         </table>
         <div class="empty" id="main-empty" style="display:none"><i>📭</i>ยังไม่มีข้อมูล</div>
@@ -607,7 +629,7 @@ i svg{
     <div class="card">
       <div class="card-title"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 3 3 4-6"/></svg></i> การใช้น้ำรายวัน (m³)</div>
       <div class="f-row">
-        <label class="f-label">เลือกจุดวัดน้ำ</label>
+        <label class="f-label">เลือก Meter</label>
         <select class="f-input" id="chart-sub" onchange="renderSubChart()"><option value="">เลือก Sub...</option></select>
       </div>
       <div class="chart-ctrl">
@@ -715,7 +737,16 @@ i svg{
 <!-- ──────────── SUMMARY PANEL ──────────── -->
 <div class="panel" id="panel-summary">
 
-  <!-- ── ตารางรายงานรายวันทั้งเดือน ── -->
+  <!-- ⏸️ ปิดชั่วคราวตามคำขอ — รอปรับรูปแบบรายงานใหม่ (รูปแบบเดิมยกมาจากแอปไฟฟ้า ไม่เข้ากับข้อมูลน้ำ)
+       แท็บ "สรุป" ถูกซ่อนไว้แล้ว (display:none) เข้าหน้านี้ไม่ได้จากเมนูปกติ
+       การ์ดรายงานเดิมเก็บไว้เป็น HTML comment ด้านล่าง (unwrap comment นั้นออก แล้วเอา
+       style display:none ออกจากปุ่มแท็บ "สรุป" ด้านบน เพื่อคืนของเดิมได้ทันทีถ้าต้องการ) -->
+  <div class="card">
+    <div class="card-title">⏸️ หน้าสรุป — ปิดชั่วคราว</div>
+    <div class="info-box">รูปแบบรายงานเดิมถูกปิดไว้ก่อน รอปรับรูปแบบใหม่ให้เหมาะกับข้อมูลน้ำ</div>
+  </div>
+
+  <!--REPORT_CARD_DISABLED_START
   <div class="card">
     <div class="card-title">📋 รายงานการใช้น้ำรายเดือน</div>
     <div class="f-2col">
@@ -729,15 +760,16 @@ i svg{
     </div>
     <div id="report-area"><div class="section-empty">📋 เลือกเดือนเพื่อดูรายงาน</div></div>
   </div>
+  REPORT_CARD_DISABLED_END-->
 
 </div>
   <!-- QR -->
   <div class="panel" id="panel-qr">
     <div class="card">
-      <div class="card-title"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h.01M17 21h4v-4"/></svg></i> QR Code ทุกจุดวัดน้ำ</div>
+      <div class="card-title"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h.01M17 21h4v-4"/></svg></i> QR Code ทุก Meter</div>
       <div class="info-box">
         <strong>Base URL:</strong> <span style="font-family:var(--font-mono);font-size:9px;color:var(--accent)" id="qr-url-preview">—</span><br>
-        <small style="color:var(--text-3)">สแกน QR เปิดจุดได้ทันที</small>
+        <small style="color:var(--text-3)">สแกน QR เปิด Meter ได้ทันที</small>
       </div>
       <div class="f-row">
          <label class="f-label">กรอง Zone</label>
@@ -776,10 +808,10 @@ i svg{
     </div>
      
     <div class="card">
-      <div class="card-title">➕ เพิ่มจุดวัดน้ำ</div>
+      <div class="card-title">➕ เพิ่ม Meter</div>
       <div class="f-3col">
-        <div class="f-row"><label class="f-label">Sub ID</label><input class="f-input" id="new-id" placeholder="WM-59"></div>
-        <div class="f-row"><label class="f-label">ชื่อ</label><input class="f-input" id="new-name" placeholder="เช่น ประปาเข้า...(คำอธิบายจุดวัด)"></div>
+        <div class="f-row"><label class="f-label">Meter ID</label><input class="f-input" id="new-id" placeholder="WM-59"></div>
+        <div class="f-row"><label class="f-label">ชื่อ</label><input class="f-input" id="new-name" placeholder="เช่น ประปาเข้า...(คำอธิบาย Meter)"></div>
         <div class="f-row">
           <label class="f-label">ทศนิยม</label>
           <select class="f-input" id="new-decimal">
@@ -792,11 +824,11 @@ i svg{
         </div>
       </div>
       <div class="f-row"><label class="f-label">Zone</label><input class="f-input" id="new-zone" placeholder="Custom"></div>
-      <button class="btn btn-primary btn-full" onclick="addSub()">➕ เพิ่มจุดวัดน้ำ</button>
+      <button class="btn btn-primary btn-full" onclick="addSub()">➕ เพิ่ม Meter</button>
     </div>
 
     <div class="card">
-      <div class="card-title">📋 รายการจุดวัดน้ำ (<span id="sub-count">0</span>)</div>
+      <div class="card-title">📋 รายการ Meter (<span id="sub-count">0</span>)</div>
       <div class="info-box" style="margin-bottom:8px">กด <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></i> เพื่อแก้ไขชื่อ, Zone, ทศนิยม และตัวคูณ</div>
       <div id="sub-list"></div>
     </div>
@@ -830,7 +862,7 @@ i svg{
     <div class="modal-handle"></div>
     <div class="modal-head"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></i> แก้ไขรายการ<button class="modal-close" onclick="closeEdit()">✕</button></div>
     <div class="warn-box">⚠️ การแก้ไขค่ามิเตอร์จะกระทบค่า "ใช้ไป" ของรายการถัดไป</div>
-    <div class="f-row"><label class="f-label">จุดวัดน้ำ</label><select class="f-input" id="edit-sub"></select></div>
+    <div class="f-row"><label class="f-label">Meter</label><select class="f-input" id="edit-sub"></select></div>
     <div class="f-row"><label class="f-label">ค่ามิเตอร์ (m³ สะสม)</label><input class="f-input kwh-input" type="number" id="edit-kwh" step="1" inputmode="decimal"></div>
     <div class="f-2col">
       <div class="f-row"><label class="f-label">วันที่</label><input class="f-input" type="date" id="edit-date"></div>
@@ -849,13 +881,13 @@ i svg{
 <div class="modal-bg" id="edit-sub-modal" onclick="closeEditSubIf(event)">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-head"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></i> แก้ไขจุดวัดน้ำ<button class="modal-close" onclick="closeEditSub()">✕</button></div>
+    <div class="modal-head"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></i> แก้ไข Meter<button class="modal-close" onclick="closeEditSub()">✕</button></div>
     <div class="f-row">
-      <label class="f-label">Sub ID (ไม่สามารถเปลี่ยนได้)</label>
+      <label class="f-label">Meter ID (ไม่สามารถเปลี่ยนได้)</label>
       <input class="f-input" id="esub-id" disabled>
     </div>
     <div class="f-row">
-      <label class="f-label">ชื่อจุด</label>
+      <label class="f-label">ชื่อ Meter</label>
       <input class="f-input" id="esub-name" placeholder="เช่น ประปาเข้าห้องน้ำ Body">
     </div>
     <div class="f-row">
@@ -912,10 +944,10 @@ const REPORT_UTIL = [
   { key:'SEPTIC', name:'Toilet/Septic', ids:['WM-35','WM-40'] }
 ];
 
-/* ───────── หมวดตามสถานที่ / ประเภทน้ำ (หน้าเลือกจุดวัด) ───────── */
-/* อิงจากฟิลด์ zone ของแต่ละจุด (มาจาก _SUBS sheet) แทนการ hardcode รายชื่อ id
-   ข้อดี: จุดใหม่ที่เพิ่มเข้ามาทีหลังจะถูกจัดหมวดอัตโนมัติตาม zone ที่ตั้งไว้
-   หมวดที่ zone ไม่ตรงกับรายการด้านล่าง จะตกไปอยู่ใน "อื่นๆ" (กันไม่ให้จุดหายไปจากหน้าจอ) */
+/* ───────── หมวดตามสถานที่ / ประเภทน้ำ (หน้าเลือก Meter) ───────── */
+/* อิงจากฟิลด์ zone ของแต่ละ Meter (มาจาก _SUBS sheet) แทนการ hardcode รายชื่อ id
+   ข้อดี: Meter ใหม่ที่เพิ่มเข้ามาทีหลังจะถูกจัดหมวดอัตโนมัติตาม zone ที่ตั้งไว้
+   หมวดที่ zone ไม่ตรงกับรายการด้านล่าง จะตกไปอยู่ใน "อื่นๆ" (กันไม่ให้ Meter หายไปจากหน้าจอ) */
 const ZONE_CATEGORY_MAP = {
   'BODY': 'Body Shop',
   'PT78': 'PT7-8',
@@ -958,7 +990,7 @@ function getCategoryOf(sub){
    ⚠️ ต้องสร้าง Google Sheet + Apps Script Web App ใหม่แยกต่างหากจากแอปไฟฟ้า
    (คนละระบบ คนละชีท) แล้วนำ URL ที่ deploy ได้มาแทนที่ค่าด้านล่างนี้ก่อนใช้งานจริง */
 const API_URL     = 'https://script.google.com/macros/s/AKfycbzdNkZejx4sRq9QZHZes12uC95dbI9iXjAJNy7nOiN_xnNNtiP0JKDWR-usdwrAA18MWw/exec';
-const QR_BASE_URL = 'https://ramesimct.github.io/WaterMeter-V1/';
+const QR_BASE_URL = 'https://ramesimct.github.io/Water-Meter-SR/';
 const ABNORMAL_MULTIPLIER = 5;
 
 /* ───────── STATE ───────── */
@@ -1228,7 +1260,7 @@ let summaryCache = {};
 // ไม่มี network round-trip เลย (ตรงข้ามกับ cache เดิมที่ยัง miss ทุกครั้งแม้ backend จะมี month-cache
 // อยู่แล้วก็ตาม เพราะ backend cache ช่วยแค่ข้าม _readAllSheet() แต่ HTTP round-trip ไป Apps Script
 // ยังเกิดอยู่ดี — ซึ่งเป็นส่วนที่กินเวลาจริง (วัดได้ 3-8 วิ ต่อครั้ง เทียบกับ compute ≈1ms)
-// ผลลัพธ์ที่ backend คืนมายังถูกต้องสำหรับช่วงที่ผู้เรียกต้องการจริง เพราะ caller ทุกจุด (loadReport,
+// ผลลัพธ์ที่ backend คืนมายังถูกต้องสำหรับช่วงที่ผู้เรียกต้องการจริง เพราะ caller ทุก Meter (loadReport,
 // renderG9Chart, renderCmpChart) กรอง/มองหาเฉพาะ date key ที่ต้องการเองอยู่แล้วจากผลลัพธ์ที่ได้กว้างขึ้น
 function _snapDayRangeToMonths(dateFrom, dateTo){
   const from = dateFrom.slice(0,7) + '-01';
@@ -1356,7 +1388,7 @@ function refreshData(){
       if(data.records  && Array.isArray(data.records))  records      = computeUsed(data.records);
       if(data.calendar && Array.isArray(data.calendar)) workCalendar = data.calendar;
       persist(); isConnected = true; invalidateSummaryCache('refreshData'); renderAll();
-      setSyncStatus('ok',`โหลดสำเร็จ — ${subs.length} จุด`);
+      setSyncStatus('ok',`โหลดสำเร็จ — ${subs.length} Meter`);
     })
     .catch(err => {
       setSyncStatus('error','โหลดไม่ได้: ' + err.message);
@@ -1418,7 +1450,7 @@ async function init(){
     localStorage.setItem('loginMode','basic');
     closeLoginGate();
     goTab('entry');
-    // รอโหลดข้อมูลจริงจบก่อนค่อยเปิดจุด — แทนการ poll ด้วย setTimeout ทุก 200ms สูงสุด 8 วิ
+    // รอโหลดข้อมูลจริงจบก่อนค่อยเปิด Meter — แทนการ poll ด้วย setTimeout ทุก 200ms สูงสุด 8 วิ
     // loadFromServer() คืน promise แล้ว (แก้ไปพร้อมกับ instrumentation ด้านบน) จึง await ตรงๆ ได้
     await loadFromServer();
     const found = subs.find(s => s.id === p.toUpperCase());
@@ -1426,7 +1458,7 @@ async function init(){
       selectSub(found.id);
       toast('📍 เปิด ' + found.id + ' จาก QR','ok');
     } else {
-      toast('ไม่พบ Sub: ' + p.toUpperCase() + ' (ลองรีเฟรช)','err');
+      toast('ไม่พบ Meter: ' + p.toUpperCase() + ' (ลองรีเฟรช)','err');
     }
   } else {
     loadFromServer();
@@ -1582,9 +1614,9 @@ function renderReport(month, lastDay){
   const totUtil = REPORT_UTIL.map(c => `<td style="text-align:right;padding:7px 8px;font-weight:700;color:var(--purple)">${Math.round(totals[c.key]).toLocaleString()}</td>`).join('');
 
   area.innerHTML = `
-    <div style="font-size:13px;font-weight:700;margin-bottom:8px;text-align:center">รายละเอียดปริมาณการใช้น้ำแต่ละจุดวัดน้ำ · ${MN[parseInt(mm)]} ${yy}</div>
+    <div style="font-size:var(--fs-md);font-weight:700;margin-bottom:8px;text-align:center">รายละเอียดปริมาณการใช้น้ำแต่ละ Meter · ${MN[parseInt(mm)]} ${yy}</div>
     <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap">
+      <table style="width:100%;border-collapse:collapse;font-size:var(--fs-sm);white-space:nowrap">
         <thead><tr style="background:var(--surface-3)">
           <th style="padding:6px 8px;position:sticky;left:0;background:var(--surface-3);text-align:left">วันที่</th>
           ${headMain}
@@ -1762,7 +1794,7 @@ function renderZoneAreas(){
    if(!subs.length){
     container.innerHTML = `<div class="section-empty" style="padding:30px">
       <div style="font-size:24px;margin-bottom:8px">⏳</div>
-      กำลังโหลดรายการจุด...<br>
+      กำลังโหลดรายการ Meter...<br>
       <small style="color:var(--text-3)">ถ้าค้างนาน กด Refresh</small>
     </div>`;
     return;
@@ -1840,7 +1872,7 @@ function previewUsed(){
   const lastKwh    = getLastKwh(activeSub.id);
   const multiplier = activeSub.multiplier !== undefined ? parseFloat(activeSub.multiplier) : 1;
   box.style.display = 'block';
-  if(lastKwh === null){ chip.className = 'chip chip-green'; chip.textContent = '📌 บันทึกครั้งแรกของ Sub นี้'; }
+  if(lastKwh === null){ chip.className = 'chip chip-green'; chip.textContent = '📌 บันทึกครั้งแรกของ Meter นี้'; }
   else {
     const diff = (val - lastKwh) * multiplier;
     chip.className = diff >= 0 ? 'chip chip-green' : 'chip chip-orange';
@@ -1865,7 +1897,7 @@ function renderRecent(){
 
 /* ════════════ SAVE RECORD ════════════ */
 async function saveRecord(){
-  if(!activeSub) return toast('เลือกจุดวัดน้ำก่อน','err');
+  if(!activeSub) return toast('เลือก Meter ก่อน','err');
   const kwh  = parseFloat(document.getElementById('in-kwh').value);
   if(isNaN(kwh) || kwh < 0) return toast('กรอกค่ามิเตอร์ด้วย','err');
   const user = document.getElementById('in-user').value.trim();
@@ -1875,7 +1907,7 @@ async function saveRecord(){
   const time = document.getElementById('in-time').value;
   const note = document.getElementById('in-note').value || '';
   const dupe = records.find(r => r.subId === activeSub.id && r.date === date);
-  if(dupe){ if(!confirm(`⚠️ จุด ${activeSub.id} วันที่ ${fmtDate(date)} มีการบันทึกแล้ว (${fmtNum(dupe.kwh, activeSub.id)} m³)\nบันทึกเพิ่มอีกหรือไม่?`)) return; }
+  if(dupe){ if(!confirm(`⚠️ Meter ${activeSub.id} วันที่ ${fmtDate(date)} มีการบันทึกแล้ว (${fmtNum(dupe.kwh, activeSub.id)} m³)\nบันทึกเพิ่มอีกหรือไม่?`)) return; }
   const lastKwh = getLastKwh(activeSub.id);
   if(lastKwh !== null && kwh < lastKwh){ if(!confirm(`ค่าที่กรอก (${kwh}) น้อยกว่าครั้งก่อน (${lastKwh})\nบันทึกต่อหรือไม่?`)) return; }
   if(lastKwh !== null && kwh > lastKwh){
@@ -1917,13 +1949,13 @@ function getRecentAvgUsed(subId){
   return chain.reduce((a,r) => a + (r.used||0), 0) / chain.length;
 }
 async function markUnableToRecord(){
-  if(!activeSub) return toast('เลือกจุดวัดน้ำก่อน','err');
+  if(!activeSub) return toast('เลือก Meter ก่อน','err');
   const lastRec = getSubRecs(activeSub.id).slice(-1)[0];
   if(!lastRec){ return toast('⚠️ ยังไม่มีค่ามิเตอร์ก่อนหน้า ไม่สามารถใช้ฟังก์ชันนี้ได้','err'); }
   const reason = prompt('📝 ระบุเหตุผลที่จดไม่ได้:\n(เช่น มิเตอร์เสีย, เข้าพื้นที่ไม่ได้)', 'ไม่สามารถบันทึกค่าได้');
   if(reason === null) return;
   const date = document.getElementById('in-date').value;
-  if(!confirm(`ยืนยันว่าจุด ${activeSub.id} วันที่ ${fmtDate(date)} จดไม่ได้?\n\nระบบจะใช้ค่าเดิม ${fmtNum(lastRec.kwh, activeSub.id)} m³\nหมายเหตุ: ${reason}`)) return;
+  if(!confirm(`ยืนยันว่า Meter ${activeSub.id} วันที่ ${fmtDate(date)} จดไม่ได้?\n\nระบบจะใช้ค่าเดิม ${fmtNum(lastRec.kwh, activeSub.id)} m³\nหมายเหตุ: ${reason}`)) return;
   const user = document.getElementById('in-user').value.trim() || currentUser || 'ไม่ระบุ';
   const time = document.getElementById('in-time').value;
   await doSaveRecord(activeSub, parseFloat(lastRec.kwh), date, time, user, '⚠️ ' + reason);
@@ -2013,17 +2045,17 @@ async function saveEditSub(){
   const zone       = document.getElementById('esub-zone').value.trim();
   const decimal    = parseInt(document.getElementById('esub-decimal').value) || 0;
   const multiplier = parseFloat(document.getElementById('esub-multiplier').value);  // ✅ ไม่ใส่ || 1
-  if(!name || !zone) return toast('⚠️ กรุณากรอกชื่อจุดและ Zone ให้ครบ','err');
+  if(!name || !zone) return toast('⚠️ กรุณากรอกชื่อ Meter และ Zone ให้ครบ','err');
   if(!isFinite(multiplier) || multiplier <= 0) return toast('⚠️ ตัวคูณต้องมากกว่า 0','err');  // ✅ เช็ค NaN ด้วย
   const updatedSub = { ...subs[editSubIndex], name, zone, decimal, multiplier };
   subs[editSubIndex] = updatedSub; persist(); closeEditSub();
   records = computeUsed(records); persist();
   renderSubList(); renderZoneAreas(); populateDDs(); renderAll();
-  toast(`✅ อัปเดตจุด ${updatedSub.id} เรียบร้อย`,'ok');
+  toast(`✅ อัปเดต Meter ${updatedSub.id} เรียบร้อย`,'ok');
   setSyncStatus('busy','กำลังซิงค์ลง Google Sheets...');
   try{
     const res = await apiPost({ action:'updateSubConfig', sub:updatedSub });
-    if(res && res.success) setSyncStatus('ok','บันทึกข้อมูลจุดลงแผ่นชีทสำเร็จ');
+    if(res && res.success) setSyncStatus('ok','บันทึกข้อมูล Meter ลงแผ่นชีทสำเร็จ');
     else throw new Error(res?.error || 'Sheets rejected');
   }catch(e){ setSyncStatus('error','บันทึกลงชีทไม่สำเร็จ (แต่เซฟเก็บในแคชแล้ว)'); }
 }
@@ -2082,13 +2114,13 @@ function renderStats(){
   const totalUsed = records.reduce((a,r) => a + (parseFloat(r.used)||0), 0);
   document.getElementById('stats-row').innerHTML = `
     <div class="stat"><div class="stat-val">${total}</div><div class="stat-lbl">Records ทั้งหมด</div></div>
-    <div class="stat"><div class="stat-val">${subsDone}/${subs.length}</div><div class="stat-lbl">Sub ที่บันทึกแล้ว</div></div>
+    <div class="stat"><div class="stat-val">${subsDone}/${subs.length}</div><div class="stat-lbl">Meter ที่บันทึกแล้ว</div></div>
     <div class="stat"><div class="stat-val">${todayN}</div><div class="stat-lbl">บันทึกวันนี้</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--green)">${Math.round(totalUsed).toLocaleString()}</div><div class="stat-lbl">รวมใช้น้ำ (m³)</div></div>`;
 }
 function updateBadge(){ document.getElementById('hdr-badge').textContent = records.length + ' rec'; }
 
-/* ════════════ CHART (รายจุด) ════════════ */
+/* ════════════ CHART (ราย Meter) ════════════ */
 /* ════════════ QR ════════════ */
 function renderQR(){
   const grid = document.getElementById('qr-grid');
@@ -2105,7 +2137,7 @@ function renderQR(){
   const filterZone = zoneSel?.value || '';
   const list = filterZone ? subs.filter(s => s.zone === filterZone) : subs;
 
-  if(!list.length){ grid.innerHTML = '<div class="section-empty">ไม่มีจุดใน Zone นี้</div>'; return; }
+  if(!list.length){ grid.innerHTML = '<div class="section-empty">ไม่มี Meter ใน Zone นี้</div>'; return; }
 
   ensureQRCode().catch(function(e){ grid.innerHTML = '<div class="warn-box">❌ โหลด QR library ไม่ได้</div>'; });
   list.forEach(sub => {
@@ -2129,7 +2161,7 @@ function renderQR(){
 /* ════════════ SETTINGS ════════════ */
 function renderSubList(){
   document.getElementById('sub-count').textContent = subs.length;
-  if(!subs.length){ document.getElementById('sub-list').innerHTML='<div class="section-empty">ยังไม่มีจุดวัดน้ำ</div>'; return; }
+  if(!subs.length){ document.getElementById('sub-list').innerHTML='<div class="section-empty">ยังไม่มี Meter</div>'; return; }
   document.getElementById('sub-list').innerHTML = subs.map((s,i) => {
     const cnt       = records.filter(r => r.subId === s.id).length;
     const totalUsed = records.filter(r => r.subId === s.id).reduce((a,r) => a+(parseFloat(r.used)||0), 0);
@@ -2172,7 +2204,7 @@ async function addSub(){
 async function removeSub(i){
   const s   = subs[i];
   const cnt = records.filter(r => r.subId === s.id).length;
-  const msg = cnt > 0 ? `ลบ ${s.id} — ${s.name}?\n(มีข้อมูล ${cnt} records ที่เชื่อมกับจุดนี้ — records จะยังอยู่)` : `ลบ ${s.id} — ${s.name}?`;
+  const msg = cnt > 0 ? `ลบ ${s.id} — ${s.name}?\n(มีข้อมูล ${cnt} records ที่เชื่อมกับ Meter นี้ — records จะยังอยู่)` : `ลบ ${s.id} — ${s.name}?`;
   if(!confirm(msg)) return;
   // ลบ backend ก่อน — ถ้าล้มเหลว ไม่ลบ local (กัน state หลุด)
   try{
@@ -2194,7 +2226,7 @@ async function exportExcel(){
   try{ await ensureXLSX(); }catch(e){ return toast('โหลด Excel library ไม่ได้','err'); }
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(dataToExport.map(r => ({
-    'ID': r.id, 'รหัสจุดวัดน้ำ': r.subId, 'คำอธิบาย': r.subName, 'หมวด': r.zone,
+    'ID': r.id, 'Meter ID': r.subId, 'คำอธิบาย': r.subName, 'หมวด': r.zone,
     'Date': fmtDate(r.date), 'Time': fmtTime(r.time),
     'm³ (Cumulative)': fmtNum(r.kwh, r.subId), 'Used (m³)': fmtNum(r.used, r.subId),
     'User': r.user, 'Note': r.note, 'Edited By': r.editedBy||'', 'Timestamp': r.ts
@@ -2378,7 +2410,7 @@ function aggregateRecords(recs, period, dateFrom, dateTo){
 }
 
 /* ══════════════════════════════════════
-   กราฟ 1: รายจุด (Sub Chart)
+   กราฟ 1: ราย Meter (Meter Chart)
    ══════════════════════════════════════ */
 var subChartState = { period:'day', type:'bar', showAvg:true, showHol:true };
 
@@ -2419,7 +2451,7 @@ function renderSubChart(){
   var subId = document.getElementById('chart-sub').value;
   var el = document.getElementById('sub-chart-el');
   var sumEl = document.getElementById('sub-chart-summary');
-  if(!subId){ el.innerHTML='<div class="section-empty">เลือกจุดวัดน้ำเพื่อดูกราฟ</div>'; sumEl.innerHTML=''; return; }
+  if(!subId){ el.innerHTML='<div class="section-empty">เลือก Meter เพื่อดูกราฟ</div>'; sumEl.innerHTML=''; return; }
 
   var _plSub = perfLabel('renderSubChart:compute'); perfStart(_plSub);
   var fromVal = document.getElementById('sub-from').value || '';
